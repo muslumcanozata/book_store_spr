@@ -1,0 +1,121 @@
+# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
+
+version: '3.9'
+
+# Define services
+services:
+  # App backend service
+  zookeeper:
+    container_name: zookeeper
+    image: bitnami/zookeeper:latest
+    restart: always
+    ports:
+      - 2181:2181
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - backend
+
+  kafka:
+    container_name: kafka
+    image: bitnami/kafka:latest
+    restart: always
+    ports:
+      - 9092:9092
+    hostname: 'kafka'
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_DELETE_TOPIC_ENABLE=true
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CREATE_TOPICS="topic-test"
+    depends_on:
+      - zookeeper
+    links:
+      - zookeeper:zookeeper
+    networks:
+      - backend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # Database Service (Mysql)
+  mysql2:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=Password1
+      - MYSQL_DATABASE=book_store
+    volumes:
+      - ./init_sql/mysql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes: 
+      - redis:/data
+    networks:
+      - backend
+
+  redisinsight:
+    container_name: redisinsight
+    image: redislabs/redisinsight:latest
+    restart: always
+    ports:
+      - 8001:8001
+    volumes:
+      - ./data/redisinsight:/db
+    networks:
+      - backend
+
+  mongo:
+    container_name: mongo
+    image: mongo:5.0.5
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=Password1
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+  keycloak:
+    image: quay.io/keycloak/keycloak:legacy
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      #KEYCLOAK_USER: admin
+      #KEYCLOAK_PASSWORD: Pa55w0rd
+      # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the MySQL JDBC driver documentation in order to use it.
+      #JDBC_PARAMS: "connectTimeout=30000"
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql
+# Volumes
+volumes:
+  redis:
+    driver: local
+  mysql_data:
+    driver: local
+# Networks to be created to facilitate communication between containers
+networks:
+  backend:
+  auth-network:
+    driver: bridge  
