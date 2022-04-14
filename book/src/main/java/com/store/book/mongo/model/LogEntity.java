@@ -15,6 +15,7 @@ import java.util.Date;
 public class LogEntity {
     @Id
     private String id;
+    private String username;
     private String operationName;
     private String tableName;
     private Date dateTime;
