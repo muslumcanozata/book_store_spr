@@ -1,14 +1,28 @@
 server:
   port: 8000
 spring:
+  application:
+    name: Book Store API
   datasource:
     url: jdbc:mysql://localhost:3306/book_store
     username: root
     password: Password1
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 8
+      minimum-idle: 2
   jpa:
     hibernate:
       ddl-auto: update
+      generate_statistics: false
+      show_sql: true
+      format_sql: true
+      dialect: org.hibernate.dialect.MySQL5Dialect
+      database-platform: org.hibernate.dialect.MySQL5Dialect
+      open-in-view: false
+      generate-ddl: true
+      temp:
+        use_jdbc_metadata_defaults: false
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     show-sql: true
     properties:
