@@ -26,20 +26,21 @@ public class LogServiceImpl implements LogService {
     private final ModelMapper mapper = new ModelMapper();
 
     @Override
-    public List<LogDTO> getAll() {
+    public List<LogDTO> getAll(String username) {
         List<LogEntity> logEntityList = logDao.findAll();
         return logEntityList.parallelStream().map(item -> mapper.map(item, LogDTO.class)).collect(Collectors.toList());
     }
 
     @Override
-    public LogDTO getOne(String id) {
+    public LogDTO getOne(String id, String username) {
         Optional<LogEntity> logEntity = logDao.findById(id);
         return mapper.map(logEntity, LogDTO.class);
     }
 
     @Override
-    public void insert(String operationName, String tableName) {
+    public void insert(String operationName, String tableName, String username) {
         LogEntity logEntity = new LogEntity();
+        logEntity.setUsername(username);
         logEntity.setDateTime(new Date());
         logEntity.setOperationName(operationName);
         logEntity.setTableName(tableName);
