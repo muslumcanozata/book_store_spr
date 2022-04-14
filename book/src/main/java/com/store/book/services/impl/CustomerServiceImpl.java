@@ -31,6 +31,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS,isolation=Isolation.READ_UNCOMMITTED,rollbackFor = Exception.class)
     public CustomersDTO insertOne(CustomerInsertRequestDTO customerInsertRequestDTO, String username) {
+        logService.insert(OperationTypes.CREATE.getName(), TABLE_NAME, username);
         Customers customers = Customers.fromInsertRequestDTO(customerInsertRequestDTO);
         Customers providedCustomer = customersDao.save(customers);
         return CustomersDTO.fromEntityToDTO(providedCustomer);
