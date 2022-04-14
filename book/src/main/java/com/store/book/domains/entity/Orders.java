@@ -1,7 +1,10 @@
 package com.store.book.domains.entity;
 
+import com.alibaba.fastjson.JSON;
+import com.store.book.domains.dto.OrderInsertRequestDTO;
 import com.store.book.domains.enums.DeliveryStatus;
 import com.store.book.domains.enums.Status;
+import com.store.book.utils.CommonUtils;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +14,7 @@ import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -50,4 +54,15 @@ public class Orders {
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "status")
     private Status status;
+
+    public static Orders fromInsertRequestDTO(OrderInsertRequestDTO orderInsertRequestDTO, Customers customers) {
+        Orders orders = new Orders();
+        orders.setOrderList(JSON.toJSONString(orderInsertRequestDTO.getOrderListDTO()));
+        orders.setTotalPrice(orderInsertRequestDTO.getTotalPrice());
+        orders.setDeliveryForecast(CommonUtils.getTomorrow());
+        orders.setCustomers(customers);
+        orders.setDeliveryStatus(DeliveryStatus.INPROCESS);
+        orders.setStatus(orderInsertRequestDTO.getStatus());
+        return orders;
+    }
 }
