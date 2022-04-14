@@ -1,5 +1,10 @@
 server:
   port: 8000
+
+swagger:
+  auth:
+    token-url: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/token/
+    client-id: ${keycloak.resource}
 spring:
   application:
     name: Book Store API
