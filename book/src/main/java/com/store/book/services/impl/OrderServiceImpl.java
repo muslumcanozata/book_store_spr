@@ -1,6 +1,7 @@
 package com.store.book.services.impl;
 
 import com.store.book.daos.OrdersDao;
+import com.store.book.daos.StocksDao;
 import com.store.book.domains.dto.OrderInsertRequestDTO;
 import com.store.book.domains.dto.OrdersDTO;
 import com.store.book.domains.entity.Customers;
@@ -29,12 +30,16 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private LogService logService;
 
+    @Autowired
+    private StocksDao stocksDao;
+
     private final String TABLE_NAME = "orders";
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS,isolation= Isolation.READ_UNCOMMITTED,rollbackFor = Exception.class)
     public OrdersDTO insertOne(OrderInsertRequestDTO orderInsertRequestDTO, String username) {
         logService.insert(OperationTypes.CREATE.getName(), TABLE_NAME, username);
+        stocksDao.decreaseStock(orderInsertRequestDTO.getOrderListDTO().getBookId(), orderInsertRequestDTO.getOrderListDTO().getAmount());
         Customers customers = customerServiceImpl.getOneInEntity(orderInsertRequestDTO.getCustomerId());
         Orders orders = Orders.fromInsertRequestDTO(orderInsertRequestDTO, customers);
         Orders providedOrders = ordersDao.save(orders);
