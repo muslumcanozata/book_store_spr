@@ -34,7 +34,7 @@ public class LogServiceImpl implements LogService {
     @Override
     public LogDTO getOne(String id, String username) {
         Optional<LogEntity> logEntity = logDao.findById(id);
-        return mapper.map(logEntity, LogDTO.class);
+        return mapper.map(logEntity.orElse(new LogEntity()), LogDTO.class);
     }
 
     @Override
