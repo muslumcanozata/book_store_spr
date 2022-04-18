@@ -8,7 +8,7 @@ This project includes some crud operations and logs these operations, global and
 
 ## Project Structure
 
-![ProjectStructure](https://i.ibb.co/nfVwsTf/Screenshot-2022-04-15-at-10-55-13-Excalidraw.png)
+![ProjectStructure](https://i.ibb.co/XCpstqz/Untitled-2022-04-18-0848-1.png)
 
 
 ## ER Diagram of Database
